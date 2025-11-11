@@ -4,7 +4,7 @@ using UnityEngine;
 public class Player : MonoBehaviour
 {
     public PlayerInput input { get; private set; }
-    public Rigidbody body { get; private set; }
+    public Rigidbody rdBody { get; private set; }
 
     private PlayerMovementStateMachine m_MoveStateMachine;
 
@@ -13,7 +13,7 @@ public class Player : MonoBehaviour
         m_MoveStateMachine = new PlayerMovementStateMachine(this);        
         // adjust Rigidbody's params in inspector as below:
         // 1) Freeze all rotation. 2) Make Collision Detection Continuous. 3) Make Interpolate be Interpolate
-        body = GetComponent<Rigidbody>();
+        rdBody = GetComponent<Rigidbody>();
 
         input = GetComponent<PlayerInput>();     
     }

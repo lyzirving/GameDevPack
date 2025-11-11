@@ -14,6 +14,11 @@ namespace MovementSystem
             m_CurrentState?.Enter();
         }
 
+        public void HandleInput()
+        {
+            m_CurrentState?.HandleInput();
+        }
+
         public void Update()
         {
             m_CurrentState?.Update();
@@ -22,11 +27,6 @@ namespace MovementSystem
         public void PhsicsUpdate()
         {
             m_CurrentState?.PhysicsUpdate();
-        }
-
-        public void HandleInput()
-        {
-            m_CurrentState?.HandleInput();
-        }
+        }        
     }
 }
