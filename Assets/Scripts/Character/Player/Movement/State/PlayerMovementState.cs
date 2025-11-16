@@ -25,6 +25,9 @@ public class PlayerMovementState : IState
 
     public virtual void HandleInput()
     {
+        if (!InputManager.Instance.isEnabled)
+            return;
+
         ReadMovement();
     }    
 
@@ -41,17 +44,15 @@ public class PlayerMovementState : IState
 
     #region Main Methods
     protected void ReadMovement()
-    {
-        m_Move2d = m_StateMachine.player.input.actions.PlayerInput.Movement.ReadValue<Vector2>();
+    {        
+        m_Move2d = InputManager.Instance.actions.PlayerInput.Movement.ReadValue<Vector2>();
     }
 
     protected void Move()
     {
         if (m_Move2d == Vector2.zero || Mathf.Approximately(m_SpeedModifier, 0f))
-        {
-            Debug.Log("returned");
             return;
-        }
+
         Vector3 direction = GetMovementDirection();
         float speed = GetMovementSpeed();
 

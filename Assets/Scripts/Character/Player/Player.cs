@@ -1,25 +1,28 @@
 using UnityEngine;
 
-[RequireComponent(typeof(PlayerInput))]
+[RequireComponent(typeof(PlayerCameraControl))]
 public class Player : MonoBehaviour
 {
-    public PlayerInput input { get; private set; }
     public Rigidbody rdBody { get; private set; }
+
+    public PlayerCameraControl cameraControl { get; private set; }
 
     private PlayerMovementStateMachine m_MoveStateMachine;
 
     private void Awake()
     {
-        m_MoveStateMachine = new PlayerMovementStateMachine(this);        
         // adjust Rigidbody's params in inspector as below:
         // 1) Freeze all rotation. 2) Make Collision Detection Continuous. 3) Make Interpolate be Interpolate
         rdBody = GetComponent<Rigidbody>();
 
-        input = GetComponent<PlayerInput>();     
+        cameraControl = GetComponent<PlayerCameraControl>();
+        cameraControl.AttachPlayer(this);
+
+        m_MoveStateMachine = new PlayerMovementStateMachine(this);                    
     }
 
     private void Start()
-    {        
+    {                      
         m_MoveStateMachine.ChangeState(m_MoveStateMachine.idleState);
     }
 
