@@ -7,6 +7,8 @@ public class Player : MonoBehaviour
 
     public PlayerCameraControl cameraControl { get; private set; }
 
+    public Transform cameraTransform;
+
     private PlayerMovementStateMachine m_MoveStateMachine;
 
     private void Awake()
@@ -17,6 +19,8 @@ public class Player : MonoBehaviour
 
         cameraControl = GetComponent<PlayerCameraControl>();
         cameraControl.AttachPlayer(this);
+
+        cameraTransform = Camera.main.transform;
 
         m_MoveStateMachine = new PlayerMovementStateMachine(this);                    
     }

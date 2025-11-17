@@ -8,9 +8,9 @@ public class PlayerCameraControl : MonoBehaviour
     private Transform m_FollowTarget;
 
     [SerializeField]
-    private float m_HorizontalRotationSpeed = 0.5f;
+    private float m_HorizontalRotationSpeed = 0.3f;
     [SerializeField]
-    private float m_VerticalRotationSpeed = 0.25f;
+    private float m_VerticalRotationSpeed = 0.12f;
     // limit camera's vertical movement
     [SerializeField]
     private float m_BottomClamp = -40f;

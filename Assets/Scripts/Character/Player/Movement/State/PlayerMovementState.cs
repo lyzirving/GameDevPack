@@ -1,4 +1,3 @@
-using System;
 using MovementSystem;
 using UnityEngine;
 
@@ -54,11 +53,30 @@ public class PlayerMovementState : IState
             return;
 
         Vector3 direction = GetMovementDirection();
+
+        Rotate(direction);
+
         float speed = GetMovementSpeed();
 
         Vector3 curVelocity = GetHorizontalVelocity();
         m_StateMachine.player.rdBody.AddForce(speed * direction - curVelocity, ForceMode.VelocityChange);
-    }    
+    }
+
+    private float Rotate(Vector3 direction)
+    {
+        float angle = direction.GetHorizontalAngle();
+        angle = AddCameraRotationToAngle(angle);        
+        return angle;
+    }
+
+    private float AddCameraRotationToAngle(float angle)
+    {
+        angle += m_StateMachine.player.cameraTransform.eulerAngles.y;
+        if(angle > 360f)
+            angle -= 360f;
+        return angle;
+    }
+
     #endregion
 
     #region Reusable Methods
