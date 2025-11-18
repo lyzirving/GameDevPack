@@ -15,12 +15,15 @@ public class PlayerMovementState : IState
 
     #region IState Methods
     public virtual void Enter()
-    {
-    }
+    {        
+        Debug.Log($"{GetType().Name} enter");
+        AddInputAction();
+    }    
 
     public virtual void Exit()
     {
-    }
+        RemoveInputAction();
+    }    
 
     public virtual void HandleInput()
     {
@@ -32,13 +35,37 @@ public class PlayerMovementState : IState
 
     public virtual void Update()
     {
-    }
+        if (CheckStateChange(out IState newState))
+        {
+            BeforeStateChange(m_StateMachine.currentState, newState);
+            m_StateMachine?.ChangeState(newState);
+        }
+    }    
 
     public virtual void PhysicsUpdate()
     {
         Move();
     }
-    
+
+    protected virtual void AddInputAction()
+    {
+        InputManager.Instance.actions.PlayerInput.WalkToggle.started += HandleWalkToggle;
+    }    
+
+    protected virtual void RemoveInputAction()
+    {
+        InputManager.Instance.actions.PlayerInput.WalkToggle.started -= HandleWalkToggle;
+    }
+
+    protected virtual bool CheckStateChange(out IState newState)
+    {
+        newState = null;
+        return false;
+    }
+
+    protected virtual void BeforeStateChange(IState currentState, IState newState)
+    {
+    }
     #endregion
 
     #region Main Methods
@@ -63,7 +90,7 @@ public class PlayerMovementState : IState
         m_StateMachine.player.rdBody.AddForce(speed * targetDir - curVelocity, ForceMode.VelocityChange);
     }
 
-    private float Rotate(Vector3 direction)
+    protected float Rotate(Vector3 direction)
     {
         float angle = direction.GetHorizontalAngle();
         angle = AddCameraRotationToAngle(angle);
@@ -79,7 +106,7 @@ public class PlayerMovementState : IState
         return angle;
     }
 
-    private void RotateTowardsTargetRotation()
+    protected void RotateTowardsTargetRotation()
     {
         float currentY = m_Player.rdBody.rotation.eulerAngles.y;
         if (Mathf.Approximately(currentY, m_Player.data.targetRotationY))
@@ -94,12 +121,27 @@ public class PlayerMovementState : IState
         m_Player.rdBody.MoveRotation(targetRot);
     }
 
-    private float AddCameraRotationToAngle(float angle)
+    protected float AddCameraRotationToAngle(float angle)
     {
         angle += m_StateMachine.player.cameraTransform.eulerAngles.y;
         if(angle > 360f)
             angle -= 360f;
         return angle;
+    }
+
+    protected void ResetVelocity()
+    {
+        m_Player.rdBody.linearVelocity = Vector3.zero;        
+    }
+
+    protected void HandleWalkToggle(UnityEngine.InputSystem.InputAction.CallbackContext context)
+    {
+        m_Player.data.shouldRun = !m_Player.data.shouldRun;
+    }
+
+    protected bool IsMoving()
+    {
+        return m_Player.data.move2d != Vector2.zero;
     }
 
     #endregion

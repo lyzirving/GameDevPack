@@ -5,28 +5,34 @@ namespace MovementSystem
 {
     public abstract class StateMachine
     {
-        protected IState m_CurrentState;
+        public IState currentState { get; private set; }
 
         public void ChangeState(IState newState)
         {
-            m_CurrentState?.Exit();
-            m_CurrentState = newState;
-            m_CurrentState?.Enter();
+            if (currentState == newState)
+            {
+                Debug.LogWarning($"incoming state[{newState}] equals current state[{currentState}]");
+                return;
+            }
+
+            currentState?.Exit();
+            currentState = newState;
+            currentState?.Enter();
         }
 
         public void HandleInput()
         {
-            m_CurrentState?.HandleInput();
+            currentState?.HandleInput();
         }
 
         public void Update()
         {
-            m_CurrentState?.Update();
+            currentState?.Update();
         }
 
         public void PhsicsUpdate()
         {
-            m_CurrentState?.PhysicsUpdate();
+            currentState?.PhysicsUpdate();
         }        
     }
 }

@@ -13,6 +13,8 @@ public struct PlayerData
     public float dumpedTargetRotationCurrentVelocity;
     public float timeToReachTargetRotation;
 
+    public bool shouldRun;
+
     public PlayerData(float inSpeed)
     {
         speed = inSpeed;
@@ -23,5 +25,7 @@ public struct PlayerData
         dumpedTargetRotationPassTime = 0f;
         dumpedTargetRotationCurrentVelocity = 0f;
         timeToReachTargetRotation = 0.075f;
+
+        shouldRun = false;
     }
 }
