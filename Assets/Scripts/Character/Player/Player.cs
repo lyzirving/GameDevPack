@@ -3,11 +3,12 @@ using UnityEngine;
 [RequireComponent(typeof(PlayerCameraControl))]
 public class Player : MonoBehaviour
 {
+    [Header("Attribute")]
+    public PlayerData data = new PlayerData(3f);
+    public Transform cameraTransform;    
+
     public Rigidbody rdBody { get; private set; }
-
-    public PlayerCameraControl cameraControl { get; private set; }
-
-    public Transform cameraTransform;
+    public PlayerCameraControl cameraControl { get; private set; }    
 
     private PlayerMovementStateMachine m_MoveStateMachine;
 
@@ -18,11 +19,10 @@ public class Player : MonoBehaviour
         rdBody = GetComponent<Rigidbody>();
 
         cameraControl = GetComponent<PlayerCameraControl>();
-        cameraControl.AttachPlayer(this);
 
         cameraTransform = Camera.main.transform;
 
-        m_MoveStateMachine = new PlayerMovementStateMachine(this);                    
+        m_MoveStateMachine = new PlayerMovementStateMachine(this);       
     }
 
     private void Start()

@@ -2,8 +2,6 @@ using UnityEngine;
 
 public class PlayerCameraControl : MonoBehaviour
 {
-    public Player player { get; private set; }
-
     [SerializeField]
     private Transform m_FollowTarget;
 
@@ -20,11 +18,6 @@ public class PlayerCameraControl : MonoBehaviour
 
     private float m_CinemachineTargetPitch = 0f;
     private float m_CinemachineTargetYaw = 0f;
-
-    public void AttachPlayer(Player player)
-    {
-        this.player = player;
-    }
 
     private void LateUpdate()
     {
