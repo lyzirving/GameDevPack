@@ -3,9 +3,11 @@ using UnityEngine;
 [RequireComponent(typeof(PlayerCameraControl))]
 public class Player : MonoBehaviour
 {
-    [Header("Attribute")]
-    public PlayerData data = new PlayerData(3f);
-    public Transform cameraTransform;    
+    [Header("Config")]
+    public PlayerConfig config;
+    public Transform cameraTransform;
+
+    public PlayerAttrs attrs = new PlayerAttrs();
 
     public Rigidbody rdBody { get; private set; }
     public PlayerCameraControl cameraControl { get; private set; }    
@@ -14,6 +16,11 @@ public class Player : MonoBehaviour
 
     private void Awake()
     {
+        if (config == null)
+        {
+            throw new System.Exception("Player Config hasn't been set yet!");
+        }
+
         // adjust Rigidbody's params in inspector as below:
         // 1) Freeze all rotation. 2) Make Collision Detection Continuous. 3) Make Interpolate be Interpolate
         rdBody = GetComponent<Rigidbody>();
@@ -27,7 +34,7 @@ public class Player : MonoBehaviour
 
     private void Start()
     {                      
-        m_MoveStateMachine.ChangeState(m_MoveStateMachine.idleState);
+        m_MoveStateMachine.ChangeState(m_MoveStateMachine.idlingState);
     }
 
     private void Update()

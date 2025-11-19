@@ -1356,7 +1356,7 @@ GameObject:
   - component: {fileID: 1863000621}
   - component: {fileID: 1863000620}
   - component: {fileID: 1863000622}
-  - component: {fileID: 1863000618}
+  - component: {fileID: 1863000624}
   - component: {fileID: 1863000623}
   m_Layer: 6
   m_Name: Player
@@ -1382,27 +1382,6 @@ Transform:
   - {fileID: 1663947636}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1863000618
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1863000616}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 599b70568590f3a44ac39043786f0be9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  data:
-    move2d: {x: 0, y: 0}
-    speed: 3
-    speedModifier: 1
-    targetRotationY: 0
-    dumpedTargetRotationPassTime: 0
-    dumpedTargetRotationCurrentVelocity: 0
-    timeToReachTargetRotation: 0.075
-  cameraTransform: {fileID: 0}
 --- !u!136 &1863000620
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -1482,6 +1461,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4668b276380ef724eaf341c81d18e001, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1863000624
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1863000616}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 599b70568590f3a44ac39043786f0be9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  config: {fileID: 11400000, guid: 2e1043ed93f79384e94dc8f59ca4e227, type: 2}
+  cameraTransform: {fileID: 0}
 --- !u!1 &2059781290
 GameObject:
   m_ObjectHideFlags: 0

@@ -35,11 +35,6 @@ public class PlayerMovementState : IState
 
     public virtual void Update()
     {
-        if (CheckStateChange(out IState newState))
-        {
-            BeforeStateChange(m_StateMachine.currentState, newState);
-            m_StateMachine?.ChangeState(newState);
-        }
     }    
 
     public virtual void PhysicsUpdate()
@@ -49,34 +44,29 @@ public class PlayerMovementState : IState
 
     protected virtual void AddInputAction()
     {
-        InputManager.Instance.actions.PlayerInput.WalkToggle.started += HandleWalkToggle;
+        InputManager.Instance.actions.PlayerInput.WalkToggle.started += OnWalkToggle;
     }    
 
     protected virtual void RemoveInputAction()
     {
-        InputManager.Instance.actions.PlayerInput.WalkToggle.started -= HandleWalkToggle;
+        InputManager.Instance.actions.PlayerInput.WalkToggle.started -= OnWalkToggle;
     }
 
-    protected virtual bool CheckStateChange(out IState newState)
+    protected virtual void OnWalkToggle(UnityEngine.InputSystem.InputAction.CallbackContext context)
     {
-        newState = null;
-        return false;
-    }
-
-    protected virtual void BeforeStateChange(IState currentState, IState newState)
-    {
+        m_Player.attrs.shouldRun = !m_Player.attrs.shouldRun;
     }
     #endregion
 
     #region Main Methods
     protected void ReadMovement()
     {
-        m_Player.data.move2d = InputManager.Instance.actions.PlayerInput.Movement.ReadValue<Vector2>();
+        m_Player.attrs.move2d = InputManager.Instance.actions.PlayerInput.Movement.ReadValue<Vector2>();
     }
 
     protected void Move()
     {
-        if (m_Player.data.move2d == Vector2.zero || Mathf.Approximately(m_Player.data.speedModifier, 0f))
+        if (m_Player.attrs.move2d == Vector2.zero || Mathf.Approximately(m_Player.attrs.speedModifier, 0f))
             return;
 
         Vector3 direction = GetInputMovement();
@@ -95,11 +85,11 @@ public class PlayerMovementState : IState
         float angle = direction.GetHorizontalAngle();
         angle = AddCameraRotationToAngle(angle);
 
-        if (!Mathf.Approximately(angle, m_Player.data.targetRotationY))
+        if (!Mathf.Approximately(angle, m_Player.attrs.targetRotationY))
         {
             // set target rotation angle
-            m_Player.data.targetRotationY = angle;
-            m_Player.data.dumpedTargetRotationPassTime = 0f;
+            m_Player.attrs.targetRotationY = angle;
+            m_Player.attrs.dumpedTargetRotationPassTime = 0f;
         }
 
         RotateTowardsTargetRotation();
@@ -109,14 +99,14 @@ public class PlayerMovementState : IState
     protected void RotateTowardsTargetRotation()
     {
         float currentY = m_Player.rdBody.rotation.eulerAngles.y;
-        if (Mathf.Approximately(currentY, m_Player.data.targetRotationY))
+        if (Mathf.Approximately(currentY, m_Player.attrs.targetRotationY))
             return;
 
-        float smoothAngle = Mathf.SmoothDampAngle(currentY, m_Player.data.targetRotationY,
-            ref m_Player.data.dumpedTargetRotationCurrentVelocity,
-            m_Player.data.timeToReachTargetRotation);
+        float smoothAngle = Mathf.SmoothDampAngle(currentY, m_Player.attrs.targetRotationY,
+            ref m_Player.attrs.dumpedTargetRotationCurrentVelocity,
+            m_Player.config.reachTargetRotationTime);
 
-        m_Player.data.dumpedTargetRotationPassTime += Time.deltaTime;
+        m_Player.attrs.dumpedTargetRotationPassTime += Time.deltaTime;
         var targetRot = Quaternion.Euler(0f, smoothAngle, 0f);
         m_Player.rdBody.MoveRotation(targetRot);
     }
@@ -132,16 +122,11 @@ public class PlayerMovementState : IState
     protected void ResetVelocity()
     {
         m_Player.rdBody.linearVelocity = Vector3.zero;        
-    }
+    }    
 
-    protected void HandleWalkToggle(UnityEngine.InputSystem.InputAction.CallbackContext context)
+    protected bool HasMovementInput()
     {
-        m_Player.data.shouldRun = !m_Player.data.shouldRun;
-    }
-
-    protected bool IsMoving()
-    {
-        return m_Player.data.move2d != Vector2.zero;
+        return m_Player.attrs.move2d != Vector2.zero;
     }
 
     #endregion
@@ -149,12 +134,12 @@ public class PlayerMovementState : IState
     #region Reusable Methods
     protected Vector3 GetInputMovement()
     {        
-        return new Vector3(m_Player.data.move2d.x, 0f, m_Player.data.move2d.y);
+        return new Vector3(m_Player.attrs.move2d.x, 0f, m_Player.attrs.move2d.y);
     }
 
     protected float GetMovementSpeed()
     {
-        return m_Player.data.speed * m_Player.data.speedModifier;
+        return m_Player.config.baseSpeed * m_Player.attrs.speedModifier;
     }
 
     protected Vector3 GetHorizontalVelocity()
