@@ -3,7 +3,7 @@
 /// </summary>
 public class IdlingState : GroundedState
 {
-    public IdlingState(PlayerMovementStateMachine playerMovementStateMachine) : base(playerMovementStateMachine)
+    public IdlingState(PlayerStateMachine playerMovementStateMachine) : base(playerMovementStateMachine)
     {               
     }
 

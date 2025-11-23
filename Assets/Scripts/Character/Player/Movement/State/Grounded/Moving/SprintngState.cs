@@ -1,7 +1,7 @@
 
 public class SprintingState : GroundedState
 {   
-    public SprintingState(PlayerMovementStateMachine playerMovementStateMachine) : base(playerMovementStateMachine)
+    public SprintingState(PlayerStateMachine playerMovementStateMachine) : base(playerMovementStateMachine)
     {       
     }
 }

@@ -17,7 +17,7 @@ public class InputManager
 
     private bool m_Enabled = false;
 
-    public PlayerInputAction actions { get; private set; }
+    public IA_Player actions { get; private set; }
 
     // Read only
     public bool isEnabled
@@ -27,7 +27,7 @@ public class InputManager
 
     public void Init()
     {
-        actions = new PlayerInputAction();
+        actions = new IA_Player();
     }
 
     public void EnableInput()

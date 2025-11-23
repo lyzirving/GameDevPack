@@ -5,7 +5,7 @@ using UnityEngine.InputSystem;
 /// </summary>
 public class RunningState : GroundedState
 {
-    public RunningState(PlayerMovementStateMachine playerMovementStateMachine) : base(playerMovementStateMachine)
+    public RunningState(PlayerStateMachine playerMovementStateMachine) : base(playerMovementStateMachine)
     {
     }
 

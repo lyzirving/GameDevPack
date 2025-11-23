@@ -10,9 +10,11 @@ public class Player : MonoBehaviour
     public PlayerAttrs attrs = new PlayerAttrs();
 
     public Rigidbody rdBody { get; private set; }
-    public PlayerCameraControl cameraControl { get; private set; }    
+    public PlayerCameraControl cameraControl { get; private set; }
 
-    private PlayerMovementStateMachine m_MoveStateMachine;
+    public ResizableCapsuleCollider resizableCapsule { get; private set; }
+
+    private PlayerStateMachine m_MoveStateMachine;
 
     private void Awake()
     {
@@ -29,7 +31,9 @@ public class Player : MonoBehaviour
 
         cameraTransform = Camera.main.transform;
 
-        m_MoveStateMachine = new PlayerMovementStateMachine(this);       
+        resizableCapsule = GetComponent<ResizableCapsuleCollider>();
+
+        m_MoveStateMachine = new PlayerStateMachine(this);       
     }
 
     private void Start()
