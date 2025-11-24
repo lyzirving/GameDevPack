@@ -5,6 +5,7 @@ public class Player : MonoBehaviour
 {
     [Header("Config")]
     public PlayerConfig config;
+
     public Transform cameraTransform;
 
     public PlayerAttrs attrs = new PlayerAttrs();

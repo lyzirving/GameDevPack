@@ -22,4 +22,9 @@ public class IdlingState : GroundedState
             return;
         }
     }
+
+    public override bool IsStationary()
+    {
+        return true;
+    }
 }

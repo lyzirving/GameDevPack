@@ -26,7 +26,7 @@ public class PlayerBaseState : IState
 
     public virtual void HandleInput()
     {
-        if (!InputManager.Instance.isEnabled)
+        if (!InputManager.instance.isEnabled)
             return;
 
         ReadMovement();
@@ -41,14 +41,33 @@ public class PlayerBaseState : IState
         Move();
     }
 
+    public virtual bool IsStationary()
+    {
+        return false;
+    }
+
+    public virtual void OnAnimationEnterEvent()
+    { 
+    }
+
+    public virtual void OnAnimationExitEvent()
+    { 
+    }
+
+    public virtual void OnAnimationTransitionEvent()
+    { 
+    }
+    #endregion
+
+    #region Input Method
     protected virtual void AddInputAction()
     {
-        InputManager.Instance.actions.PlayerInput.WalkToggle.started += OnWalkToggle;
-    }    
+        InputManager.instance.actions.PlayerInput.WalkToggle.started += OnWalkToggle;
+    }
 
     protected virtual void RemoveInputAction()
     {
-        InputManager.Instance.actions.PlayerInput.WalkToggle.started -= OnWalkToggle;
+        InputManager.instance.actions.PlayerInput.WalkToggle.started -= OnWalkToggle;
     }
 
     protected virtual void OnWalkToggle(UnityEngine.InputSystem.InputAction.CallbackContext context)
@@ -60,7 +79,7 @@ public class PlayerBaseState : IState
     #region Main Methods
     protected void ReadMovement()
     {
-        m_Player.attrs.move2d = InputManager.Instance.actions.PlayerInput.Movement.ReadValue<Vector2>();
+        m_Player.attrs.move2d = InputManager.instance.actions.PlayerInput.Movement.ReadValue<Vector2>();
     }
 
     protected void Move()
@@ -81,8 +100,17 @@ public class PlayerBaseState : IState
 
     protected float Rotate(Vector3 direction)
     {
+        float angle = UpdateTargetRotation(direction, true);
+        RotateTowardsTargetRotation();
+        return angle;
+    }
+
+    protected float UpdateTargetRotation(Vector3 direction, bool shouldConsiderCameraRotation = true)
+    {
         float angle = direction.GetHorizontalAngle();
-        angle = AddCameraRotationToAngle(angle);
+
+        if (shouldConsiderCameraRotation)
+            angle = AddCameraRotationToAngle(angle);
 
         if (!Mathf.Approximately(angle, m_Player.attrs.targetRotationY))
         {
@@ -90,8 +118,6 @@ public class PlayerBaseState : IState
             m_Player.attrs.targetRotationY = angle;
             m_Player.attrs.dumpedTargetRotationPassTime = 0f;
         }
-
-        RotateTowardsTargetRotation();
         return angle;
     }
 
@@ -136,9 +162,14 @@ public class PlayerBaseState : IState
         return new Vector3(m_Player.attrs.move2d.x, 0f, m_Player.attrs.move2d.y);
     }
 
-    protected float GetMovementSpeed()
+    protected float GetMovementSpeed(bool shouldConsiderSlopes = true)
     {
-        return m_Player.config.baseSpeed * m_Player.attrs.speedModifier * m_Player.attrs.slopeSpeedModifier;
+        float speed = m_Player.config.baseSpeed * m_Player.attrs.speedModifier;
+        if (shouldConsiderSlopes)
+        {
+            speed *= m_Player.attrs.slopeSpeedModifier;
+        }
+        return speed;     
     }
 
     protected Vector3 GetHorizontalVelocity()

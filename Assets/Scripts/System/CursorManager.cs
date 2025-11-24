@@ -21,7 +21,7 @@ public class CursorManager
         Debug.Log("HideCursor");
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
-        InputManager.Instance.EnableInput();
+        InputManager.instance.EnableInput();
     }
 
     public void ShowCursor()
@@ -29,7 +29,7 @@ public class CursorManager
         Debug.Log("ShowCursor");
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
-        InputManager.Instance.DisableInput();
+        InputManager.instance.DisableInput();
     }
 
     public bool IsCursorHide()

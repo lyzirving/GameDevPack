@@ -6,6 +6,7 @@ namespace MovementSystem
     public abstract class StateMachine
     {
         public IState currentState { get; private set; }
+        public IState lastState { get; private set; }
 
         public void ChangeState(IState newState)
         {
@@ -16,6 +17,7 @@ namespace MovementSystem
             }
 
             currentState?.Exit();
+            lastState = currentState;
             currentState = newState;
             currentState?.Enter();
         }
@@ -33,6 +35,21 @@ namespace MovementSystem
         public void PhsicsUpdate()
         {
             currentState?.PhysicsUpdate();
-        }        
+        }
+
+        public void OnAnimationEnterEvent()
+        {
+            currentState?.OnAnimationEnterEvent();
+        }
+
+        public void OnAnimationExitEvent()
+        {
+            currentState?.OnAnimationExitEvent();
+        }
+
+        public void OnAnimationTransitionEvent()
+        { 
+            currentState?.OnAnimationTransitionEvent();
+        }
     }
 }

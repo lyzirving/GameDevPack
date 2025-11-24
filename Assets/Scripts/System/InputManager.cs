@@ -1,9 +1,11 @@
+using System.Collections;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class InputManager
 {
     private static InputManager m_Instance;
-    public static InputManager Instance
+    public static InputManager instance
     {
         get
         {
@@ -36,9 +38,26 @@ public class InputManager
         m_Enabled = (actions != null);
     }
 
-    public void DisableInput() 
+    public void DisableInput()
     {
         actions?.Disable();
         m_Enabled = false;
+    }
+
+    public void DisableAction(InputAction action)
+    { 
+        action?.Disable();
+    }
+
+    public void DisableActionForTime(InputAction action, float time)
+    {
+        CoroutineRunner.Run(DisableActionForTimeCoroutine(action, time));
+    }
+
+    private IEnumerator DisableActionForTimeCoroutine(InputAction action, float time)
+    {
+        action?.Disable();
+        yield return new WaitForSeconds(time);
+        action?.Enable();
     }
 }

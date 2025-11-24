@@ -29,6 +29,25 @@ public class GroundedState : PlayerBaseState
         Float();
     }
 
+    #region Input Method
+    protected override void AddInputAction()
+    {
+        base.AddInputAction();
+        InputManager.instance.actions.PlayerInput.Dash.started += OnStartDash;
+    }    
+
+    protected override void RemoveInputAction()
+    {
+        base.RemoveInputAction();
+        InputManager.instance.actions.PlayerInput.Dash.started -= OnStartDash;
+    }
+
+    protected virtual void OnStartDash(UnityEngine.InputSystem.InputAction.CallbackContext context)
+    {
+        m_StateMachine.ChangeState(m_StateMachine.dashState);
+    }
+    #endregion
+
     protected void Float()
     {
         Vector3 centerInWorldSpace = m_Player.resizableCapsule.colliderData.collider.bounds.center;
@@ -51,7 +70,7 @@ public class GroundedState : PlayerBaseState
             Vector3 liftForce = new Vector3(0f, amountToLift, 0f);
             m_Player.rdBody.AddForce(liftForce, ForceMode.VelocityChange);
         }
-    }
+    }    
 
     private float SetSlopeSpeedByGroundAngle(float groundAngle)
     {
