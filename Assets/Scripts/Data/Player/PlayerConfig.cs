@@ -22,10 +22,11 @@ public class PlayerConfig : ScriptableObject
     public AnimationCurve slopeSpeedCurve;
 
     #region Dash Data
-    [Header("Dash Data")]
+    [Header("Dashing Data")]
     [Range(1f, 3f)]
     public float dashSpeedModifer = 2f;
 
+    [Tooltip("Time interval between two dash")]
     [Range(0f, 2f)]
     public float consecutiveDashTime = 1f;
 
@@ -34,5 +35,20 @@ public class PlayerConfig : ScriptableObject
 
     [Range(0f, 5f)]
     public float dashLimitCooldown = 1.75f;
+
+    [Range(0f, 2f)]
+    public float dashDuration = 0.5f;
     #endregion
+
+    [Header("Sprinting Data")]
+    [Range(1f, 3f)]
+    public float sprintSpeedModifer = 1.6f;
+
+    [Tooltip("Transition time from sprint to run since sprint is canceled")]
+    [Range(0f, 5f)]
+    public float sprintToRunTime = 1f;
+
+    [Tooltip("Transition time from run to walk since walk is canceled")]
+    [Range(0f, 2f)]
+    public float runToWalkTime = 0.5f;
 }

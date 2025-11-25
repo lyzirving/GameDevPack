@@ -33,18 +33,24 @@ public class GroundedState : PlayerBaseState
     protected override void AddInputAction()
     {
         base.AddInputAction();
-        InputManager.instance.actions.PlayerInput.Dash.started += OnStartDash;
+        InputManager.instance.actions.PlayerInput.Dash.started += OnDashPerform;
+        InputManager.instance.actions.PlayerInput.Dash.canceled += OnDashCancel;
     }    
 
     protected override void RemoveInputAction()
     {
         base.RemoveInputAction();
-        InputManager.instance.actions.PlayerInput.Dash.started -= OnStartDash;
+        InputManager.instance.actions.PlayerInput.Dash.started -= OnDashPerform;
+        InputManager.instance.actions.PlayerInput.Dash.canceled -= OnDashCancel;
     }
 
-    protected virtual void OnStartDash(UnityEngine.InputSystem.InputAction.CallbackContext context)
+    protected virtual void OnDashPerform(UnityEngine.InputSystem.InputAction.CallbackContext context)
     {
         m_StateMachine.ChangeState(m_StateMachine.dashState);
+    }
+
+    protected virtual void OnDashCancel(UnityEngine.InputSystem.InputAction.CallbackContext context)
+    {        
     }
     #endregion
 

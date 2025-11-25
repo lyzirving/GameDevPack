@@ -5,6 +5,7 @@ public class PlayerBaseState : IState
 {
     protected Player m_Player;
     protected PlayerStateMachine m_StateMachine;
+    protected float m_StartTime;
 
     public PlayerBaseState(PlayerStateMachine stateMachine)
     {
@@ -17,6 +18,7 @@ public class PlayerBaseState : IState
     {        
         Debug.Log($"{GetType().Name} enter");
         AddInputAction();
+        m_StartTime = Time.time;
     }    
 
     public virtual void Exit()
@@ -148,6 +150,11 @@ public class PlayerBaseState : IState
     {
         m_Player.rdBody.linearVelocity = Vector3.zero;        
     }    
+
+    protected bool HasVelocity()
+    {
+        return m_Player.rdBody.linearVelocity != Vector3.zero;
+    }
 
     protected bool HasMovementInput()
     {

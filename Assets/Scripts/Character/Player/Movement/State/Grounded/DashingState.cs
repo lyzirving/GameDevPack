@@ -1,27 +1,39 @@
+using System;
 using UnityEngine;
 
 /// <summary>
-/// DashState can be transit from Idle state, all movement state, all stopping state and light landing state.
+/// DashingState can be transit from Idle state, all movement state, all stopping state and light landing state.
 /// </summary>
-public class DashState : GroundedState
+public class DashingState : GroundedState
 {
-    private float m_StartTime;
-    private int m_ConsecutiveDashUsed;    
+    private int m_ConsecutiveDashUsed;
+    private float m_LastStartTime;
 
-    public DashState(PlayerStateMachine playerMovementStateMachine) : base(playerMovementStateMachine)
+    public DashingState(PlayerStateMachine playerMovementStateMachine) : base(playerMovementStateMachine)
     {
     }
 
     #region IState Method
     public override void Enter()
     {
+        m_LastStartTime = m_StartTime;
         base.Enter();
         m_Player.attrs.speedModifier = m_Player.config.dashSpeedModifer;
 
         Dash();
         UpdateConsecutiveDashes();
-        m_StartTime = Time.time;
     }
+
+    public override void Update()
+    {
+        // Should not call parent method in this case
+        // base.Update();
+
+        if(Time.time < m_StartTime + m_Player.config.dashDuration)
+            return;
+
+        StopDashing();
+    }    
 
     public override void OnAnimationTransitionEvent()
     {
@@ -38,7 +50,7 @@ public class DashState : GroundedState
     #endregion
 
     #region Input Method
-    protected override void OnStartDash(UnityEngine.InputSystem.InputAction.CallbackContext context)
+    protected override void OnDashPerform(UnityEngine.InputSystem.InputAction.CallbackContext context)
     {
         // Do nothing
     }
@@ -69,7 +81,7 @@ public class DashState : GroundedState
 
         ++m_ConsecutiveDashUsed;
 
-        if (m_ConsecutiveDashUsed >= m_Player.config.consecutiveDashLimit)
+        if (m_ConsecutiveDashUsed > m_Player.config.consecutiveDashLimit)
         {
             m_ConsecutiveDashUsed = 0;
             InputManager.instance.DisableActionForTime(InputManager.instance.actions.PlayerInput.Dash, m_Player.config.dashLimitCooldown); 
@@ -78,7 +90,19 @@ public class DashState : GroundedState
 
     private bool IsConsecutive()
     {
-        return Time.time < m_StartTime +  m_Player.config.consecutiveDashTime;
+        return Time.time < m_LastStartTime +  m_Player.config.consecutiveDashTime;
+    }
+
+    private void StopDashing()
+    {
+        if (!HasMovementInput())
+        {
+            m_StateMachine.ChangeState(m_StateMachine.idlingState);
+        }
+        else 
+        {
+            m_StateMachine.ChangeState(m_StateMachine.runningState);
+        }
     }
     #endregion
 }
