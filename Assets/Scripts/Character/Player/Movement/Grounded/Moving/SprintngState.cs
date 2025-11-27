@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class SprintingState : GroundedState
 {   
@@ -12,6 +13,7 @@ public class SprintingState : GroundedState
     {
         base.Enter();
         m_Player.attrs.speedModifier = m_Player.config.sprintSpeedModifer;
+        m_Player.attrs.currentJumpForce = m_Player.config.strongJumpForce;
     }
 
     public override void Exit()
@@ -48,6 +50,11 @@ public class SprintingState : GroundedState
         InputManager.instance.actions.PlayerInput.Sprint.canceled -= OnCancelSprint;
     }
 
+    protected override void OnMoveCancel(InputAction.CallbackContext context)
+    {
+        m_StateMachine.ChangeState(m_StateMachine.hardStoppingState);
+    }
+
     private void OnPerformSprint(UnityEngine.InputSystem.InputAction.CallbackContext context)
     {
         Debug.Log("OnPerformSprint");
@@ -61,7 +68,7 @@ public class SprintingState : GroundedState
     }
     #endregion
 
-    #region Main Method
+    #region Main Methods
     private void StopSprinting()
     {
         if (!HasMovementInput())

@@ -11,16 +11,16 @@ public class IdlingState : GroundedState
     {
         base.Enter();
         m_Player.attrs.speedModifier = 0f;
+        m_Player.attrs.currentJumpForce = m_Player.config.stationaryJumpForce;
         ResetVelocity();
     }
 
     public override void Update()
     {
-        if (HasMovementInput())
-        {
-            m_StateMachine.ChangeState(m_Player.attrs.shouldRun ? m_StateMachine.runningState : m_StateMachine.walkingState);
+        if (!HasMovementInput())
             return;
-        }
+
+        OnMove();
     }
 
     public override bool IsStationary()

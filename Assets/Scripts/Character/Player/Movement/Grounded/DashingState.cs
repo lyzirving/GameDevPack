@@ -8,17 +8,20 @@ public class DashingState : GroundedState
 {
     private int m_ConsecutiveDashUsed;
     private float m_LastStartTime;
+    private bool m_ShouldKeepRotate = false;
 
     public DashingState(PlayerStateMachine playerMovementStateMachine) : base(playerMovementStateMachine)
     {
     }
 
-    #region IState Method
+    #region IState Methods
     public override void Enter()
     {
         m_LastStartTime = m_StartTime;
         base.Enter();
         m_Player.attrs.speedModifier = m_Player.config.dashSpeedModifer;
+        m_Player.attrs.currentJumpForce = m_Player.config.strongJumpForce;
+        m_ShouldKeepRotate = HasMovementInput();
 
         Dash();
         UpdateConsecutiveDashes();
@@ -26,43 +29,52 @@ public class DashingState : GroundedState
 
     public override void Update()
     {
-        // Should not call parent method in this case
-        // base.Update();
-
         if(Time.time < m_StartTime + m_Player.config.dashDuration)
             return;
 
         StopDashing();
-    }    
+    }
+
+    public override void PhysicsUpdate()
+    {
+        base.PhysicsUpdate();
+    }
 
     public override void OnAnimationTransitionEvent()
-    {
-        base.OnAnimationTransitionEvent();
-
+    {       
         if (!HasMovementInput())
         {
-            m_StateMachine.ChangeState(m_StateMachine.idlingState);
+            m_StateMachine.ChangeState(m_StateMachine.hardStoppingState);
             return;
         }
         m_StateMachine.ChangeState(m_StateMachine.sprintingState);
     }
-
     #endregion
 
     #region Input Method
+    protected override void OnMoveStart(UnityEngine.InputSystem.InputAction.CallbackContext context)
+    {
+        m_ShouldKeepRotate = true;
+    }
+
+    protected override void OnMoveCancel(UnityEngine.InputSystem.InputAction.CallbackContext context)
+    {
+        m_ShouldKeepRotate = false;
+    }
+
     protected override void OnDashPerform(UnityEngine.InputSystem.InputAction.CallbackContext context)
     {
-        // Do nothing
+        // Should do nothing
     }
     #endregion
 
-    #region Main Method
+    #region Main Methods
     private void Dash()
     {
         var dashDirection = m_Player.transform.forward;
         dashDirection.y = 0f;
 
-        if (m_StateMachine.lastState.IsStationary())
+        if (!HasMovementInput())
         {
             UpdateTargetRotation(dashDirection, false);
         }

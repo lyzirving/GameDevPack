@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -15,6 +14,7 @@ public class RunningState : GroundedState
     {
         base.Enter();
         m_Player.attrs.speedModifier = m_Player.config.runSpeedModifer;
+        m_Player.attrs.currentJumpForce = m_Player.config.mediumJumpForce;
     }
 
     public override void Update()
@@ -28,15 +28,22 @@ public class RunningState : GroundedState
             return;
 
         StopRunning();
-    }    
+    }
+
+    #region Input Method
+    protected override void OnMoveCancel(InputAction.CallbackContext context)
+    {
+        m_StateMachine.ChangeState(m_StateMachine.mediumStoppingState);
+    }
 
     protected override void OnWalkToggle(InputAction.CallbackContext context)
     {
         base.OnWalkToggle(context);
         m_StateMachine.ChangeState(m_StateMachine.walkingState);
     }
+    #endregion
 
-    #region Main Method
+    #region Main Methods
     private void StopRunning()
     {
         if (!HasMovementInput())

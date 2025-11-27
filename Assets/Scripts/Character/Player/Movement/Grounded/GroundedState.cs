@@ -7,19 +7,11 @@ public class GroundedState : PlayerBaseState
     {
     }
 
+    #region IState Methods
     public override void Enter()
     {
         base.Enter();
         m_Player.attrs.slopeSpeedModifier = 1f;
-    }
-
-    public override void Update()
-    {
-        if (!HasMovementInput())
-        {
-            m_StateMachine.ChangeState(m_StateMachine.idlingState);
-            return;
-        }
     }
 
     public override void PhysicsUpdate()
@@ -28,6 +20,7 @@ public class GroundedState : PlayerBaseState
 
         Float();
     }
+    #endregion
 
     #region Input Method
     protected override void AddInputAction()
@@ -35,13 +28,23 @@ public class GroundedState : PlayerBaseState
         base.AddInputAction();
         InputManager.instance.actions.PlayerInput.Dash.started += OnDashPerform;
         InputManager.instance.actions.PlayerInput.Dash.canceled += OnDashCancel;
+
+        InputManager.instance.actions.PlayerInput.Movement.started += OnMoveStart;
+        InputManager.instance.actions.PlayerInput.Movement.canceled += OnMoveCancel;
+
+        InputManager.instance.actions.PlayerInput.Jump.started += OnJumpStart;
     }    
 
     protected override void RemoveInputAction()
     {
         base.RemoveInputAction();
+        InputManager.instance.actions.PlayerInput.Movement.started -= OnMoveStart;
+        InputManager.instance.actions.PlayerInput.Movement.canceled -= OnMoveCancel;
+
         InputManager.instance.actions.PlayerInput.Dash.started -= OnDashPerform;
         InputManager.instance.actions.PlayerInput.Dash.canceled -= OnDashCancel;
+
+        InputManager.instance.actions.PlayerInput.Jump.started -= OnJumpStart;
     }
 
     protected virtual void OnDashPerform(UnityEngine.InputSystem.InputAction.CallbackContext context)
@@ -52,8 +55,41 @@ public class GroundedState : PlayerBaseState
     protected virtual void OnDashCancel(UnityEngine.InputSystem.InputAction.CallbackContext context)
     {        
     }
+
+    protected virtual void OnMoveStart(UnityEngine.InputSystem.InputAction.CallbackContext context)
+    {
+    }
+
+    protected virtual void OnMoveCancel(UnityEngine.InputSystem.InputAction.CallbackContext context)
+    {
+    }
+
+    private void OnJumpStart(UnityEngine.InputSystem.InputAction.CallbackContext context)
+    {
+        m_StateMachine.ChangeState(m_StateMachine.jumppingState);
+    }
     #endregion
 
+    #region Virtual Methods
+    protected virtual void OnMove()
+    {
+        if (m_Player.attrs.shouldSprint)
+        {
+            m_StateMachine.ChangeState(m_StateMachine.sprintingState);
+            return;
+        }
+
+        if (m_Player.attrs.shouldRun)
+        {
+            m_StateMachine.ChangeState(m_StateMachine.runningState);
+            return;
+        }
+
+        m_StateMachine.ChangeState(m_StateMachine.walkingState);
+    }
+    #endregion
+
+    #region Main Methods
     protected void Float()
     {
         Vector3 centerInWorldSpace = m_Player.resizableCapsule.colliderData.collider.bounds.center;
@@ -89,4 +125,5 @@ public class GroundedState : PlayerBaseState
 
         return slopeSpeedModifier;
     }
+    #endregion
 }

@@ -13,11 +13,19 @@ public class WalkingState : GroundedState
     {
         base.Enter();
         m_Player.attrs.speedModifier = m_Player.config.walkSpeedModifer;
-    }    
+        m_Player.attrs.currentJumpForce = m_Player.config.weakJumpForce;
+    }
+
+    #region Input Method
+    protected override void OnMoveCancel(InputAction.CallbackContext context)
+    {
+        m_StateMachine.ChangeState(m_StateMachine.lightStoppingState);
+    }
 
     protected override void OnWalkToggle(InputAction.CallbackContext context)
     {
         base.OnWalkToggle(context);
         m_StateMachine.ChangeState(m_StateMachine.runningState);
     }
+    #endregion
 }

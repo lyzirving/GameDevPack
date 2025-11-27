@@ -51,5 +51,10 @@ namespace MovementSystem
         { 
             currentState?.OnAnimationTransitionEvent();
         }
+
+        public void OnTriggerEnter(Collider collider)
+        { 
+            currentState?.OnTriggerEnter(collider);
+        }
     }
 }

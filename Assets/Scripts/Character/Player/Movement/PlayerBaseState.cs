@@ -5,7 +5,7 @@ public class PlayerBaseState : IState
 {
     protected Player m_Player;
     protected PlayerStateMachine m_StateMachine;
-    protected float m_StartTime;
+    protected float m_StartTime;    
 
     public PlayerBaseState(PlayerStateMachine stateMachine)
     {
@@ -16,9 +16,10 @@ public class PlayerBaseState : IState
     #region IState Methods
     public virtual void Enter()
     {        
-        Debug.Log($"{GetType().Name} enter");
+        Debug.Log($"enter {GetType().Name}");
         AddInputAction();
         m_StartTime = Time.time;
+        m_Player.attrs.reachTargetRotationTime = m_Player.config.reachTargetRotationTime;
     }    
 
     public virtual void Exit()
@@ -59,22 +60,36 @@ public class PlayerBaseState : IState
     public virtual void OnAnimationTransitionEvent()
     { 
     }
+
+    public virtual void OnTriggerEnter(Collider collider)
+    {
+        if (Utility.IsGroundLayer(collider.gameObject.layer))
+        { 
+            OnContactGround(collider);
+        }
+    }
     #endregion
 
     #region Input Method
     protected virtual void AddInputAction()
     {
         InputManager.instance.actions.PlayerInput.WalkToggle.started += OnWalkToggle;
-    }
+    }    
 
     protected virtual void RemoveInputAction()
     {
         InputManager.instance.actions.PlayerInput.WalkToggle.started -= OnWalkToggle;
-    }
+    }    
 
     protected virtual void OnWalkToggle(UnityEngine.InputSystem.InputAction.CallbackContext context)
     {
         m_Player.attrs.shouldRun = !m_Player.attrs.shouldRun;
+    }
+    #endregion
+
+    #region Virtual Methods
+    protected virtual void OnContactGround(Collider collider)
+    { 
     }
     #endregion
 
@@ -131,7 +146,7 @@ public class PlayerBaseState : IState
 
         float smoothAngle = Mathf.SmoothDampAngle(currentY, m_Player.attrs.targetRotationY,
             ref m_Player.attrs.dumpedTargetRotationCurrentVelocity,
-            m_Player.config.reachTargetRotationTime);
+            m_Player.attrs.reachTargetRotationTime - m_Player.attrs.dumpedTargetRotationPassTime);
 
         m_Player.attrs.dumpedTargetRotationPassTime += Time.deltaTime;
         var targetRot = Quaternion.Euler(0f, smoothAngle, 0f);
@@ -146,14 +161,22 @@ public class PlayerBaseState : IState
         return angle;
     }
 
+    protected void DecelerateHorizontally()
+    {
+        var vel = GetHorizontalVelocity();
+        m_Player.rdBody.AddForce(-vel * m_Player.attrs.decelerationForce, ForceMode.Acceleration);
+    }
+
     protected void ResetVelocity()
     {
         m_Player.rdBody.linearVelocity = Vector3.zero;        
     }    
 
-    protected bool HasVelocity()
+    protected bool IsMoveHorizontally(float miniMagnitude = 0.1f)
     {
-        return m_Player.rdBody.linearVelocity != Vector3.zero;
+        var vel = GetHorizontalVelocity();
+        var vel2d = new Vector2(vel.x, vel.z);
+        return vel2d.magnitude > miniMagnitude;
     }
 
     protected bool HasMovementInput()
@@ -161,11 +184,8 @@ public class PlayerBaseState : IState
         return m_Player.attrs.move2d != Vector2.zero;
     }
 
-    #endregion
-
-    #region Reusable Methods
     protected Vector3 GetInputMovement()
-    {        
+    {
         return new Vector3(m_Player.attrs.move2d.x, 0f, m_Player.attrs.move2d.y);
     }
 
@@ -176,7 +196,7 @@ public class PlayerBaseState : IState
         {
             speed *= m_Player.attrs.slopeSpeedModifier;
         }
-        return speed;     
+        return speed;
     }
 
     protected Vector3 GetHorizontalVelocity()

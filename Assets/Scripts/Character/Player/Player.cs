@@ -8,7 +8,7 @@ public class Player : MonoBehaviour
 
     public Transform cameraTransform;
 
-    public PlayerAttrs attrs = new PlayerAttrs();
+    public PlayerAttrs attrs;
 
     public Rigidbody rdBody { get; private set; }
     public PlayerCameraControl cameraControl { get; private set; }
@@ -52,5 +52,10 @@ public class Player : MonoBehaviour
     private void FixedUpdate()
     {
         m_MoveStateMachine.PhsicsUpdate();
+    }
+
+    private void OnTriggerEnter(Collider collider)
+    {
+        m_MoveStateMachine.OnTriggerEnter(collider);
     }
 }
