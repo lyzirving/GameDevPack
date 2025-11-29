@@ -68,6 +68,11 @@ public class ResizableCapsuleCollider : MonoBehaviour
         m_CapsuleColliderData.UpdateColliderData();
     }
 
+    public Vector3 CenterInWordSpace()
+    {
+        return m_CapsuleColliderData.collider.bounds.center;
+    }
+
     private void SetCapsuleColliderRadius(float radius)
     {
         m_CapsuleColliderData.collider.radius = radius;

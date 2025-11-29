@@ -12,7 +12,8 @@ public class GroundedState : PlayerBaseState
     {
         base.Enter();
         m_Player.attrs.slopeSpeedModifier = 1f;
-    }
+        ShouldUpdateSprintState();
+    }    
 
     public override void PhysicsUpdate()
     {
@@ -64,7 +65,7 @@ public class GroundedState : PlayerBaseState
     {
     }
 
-    private void OnJumpStart(UnityEngine.InputSystem.InputAction.CallbackContext context)
+    protected virtual void OnJumpStart(UnityEngine.InputSystem.InputAction.CallbackContext context)
     {
         m_StateMachine.ChangeState(m_StateMachine.jumppingState);
     }
@@ -92,7 +93,7 @@ public class GroundedState : PlayerBaseState
     #region Main Methods
     protected void Float()
     {
-        Vector3 centerInWorldSpace = m_Player.resizableCapsule.colliderData.collider.bounds.center;
+        Vector3 centerInWorldSpace = m_Player.resizableCapsule.CenterInWordSpace();
         var ray = new Ray(centerInWorldSpace, Vector3.down);
 
         if (Physics.Raycast(ray, out RaycastHit hit, m_Player.resizableCapsule.slopeData.floatRayDistance, LayerMask.GetMask("Ground"), QueryTriggerInteraction.Ignore))
@@ -124,6 +125,17 @@ public class GroundedState : PlayerBaseState
         }
 
         return slopeSpeedModifier;
+    }
+
+    private void ShouldUpdateSprintState()
+    {
+        if (!m_Player.attrs.shouldSprint)
+            return;
+
+        if(HasMovementInput())
+            return;
+
+        m_Player.attrs.shouldSprint = false;
     }
     #endregion
 }

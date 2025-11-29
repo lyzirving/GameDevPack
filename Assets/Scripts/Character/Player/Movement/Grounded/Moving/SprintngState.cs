@@ -3,23 +3,31 @@ using UnityEngine.InputSystem;
 
 public class SprintingState : GroundedState
 {   
-    private bool m_KeepSprint = false;
+    private bool m_KeepSprint;
+    private bool m_ShouldResetSprintingState;
 
     public SprintingState(PlayerStateMachine playerMovementStateMachine) : base(playerMovementStateMachine)
     {       
     }
 
+    #region IState Methods
     public override void Enter()
     {
         base.Enter();
+        m_KeepSprint = false;
+        m_ShouldResetSprintingState = true;
         m_Player.attrs.speedModifier = m_Player.config.sprintSpeedModifer;
         m_Player.attrs.currentJumpForce = m_Player.config.strongJumpForce;
     }
 
     public override void Exit()
     {
-        base.Exit();
-        m_KeepSprint = false;
+        base.Exit();        
+        if (m_ShouldResetSprintingState)
+        {
+            m_KeepSprint = false;
+            m_Player.attrs.shouldSprint = false;
+        }        
     }
 
     public override void Update()
@@ -33,7 +41,8 @@ public class SprintingState : GroundedState
             return;
 
         StopSprinting();
-    }    
+    }
+    #endregion 
 
     #region Input Method
     protected override void AddInputAction()
@@ -55,15 +64,21 @@ public class SprintingState : GroundedState
         m_StateMachine.ChangeState(m_StateMachine.hardStoppingState);
     }
 
+    protected override void OnJumpStart(InputAction.CallbackContext context)
+    {
+        // shouldn't reset sprinting state before jump
+        m_ShouldResetSprintingState = false;
+        base.OnJumpStart(context);
+    }
+
     private void OnPerformSprint(UnityEngine.InputSystem.InputAction.CallbackContext context)
     {
-        Debug.Log("OnPerformSprint");
         m_KeepSprint = true;
+        m_Player.attrs.shouldSprint = true;
     }
 
     private void OnCancelSprint(UnityEngine.InputSystem.InputAction.CallbackContext context)
     {
-        Debug.Log("OnCancelSprint");
         m_KeepSprint = false;
     }
     #endregion

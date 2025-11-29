@@ -15,6 +15,7 @@ public class JumppingState : AirborneState
         base.Enter();
         m_Player.attrs.speedModifier = 0f;
         m_Player.attrs.reachTargetRotationTime = m_Player.config.jumpReachTargetRotationTime;
+        m_Player.attrs.decelerationForce = m_Player.config.jumpDecelerationForce;
         m_KeepRotate = HasMovementInput();
 
         Jump();
@@ -27,7 +28,16 @@ public class JumppingState : AirborneState
         {
             RotateTowardsTargetRotation();
         }
+
+        if (IsMovingUp())
+        {
+            // Make player go to the top faster and less floaty
+            DecelerateVertically();
+        }
     }
+    #endregion
+
+    #region Input Methods
     #endregion
 
     #region Main Methods
@@ -44,9 +54,32 @@ public class JumppingState : AirborneState
         jumpForce.x *= jumpDirection.x;
         jumpForce.z *= jumpDirection.z;
 
+        CalcJumpForceOnSlope(ref jumpForce);
         ResetVelocity();
 
         m_Player.rdBody.AddForce(jumpForce, ForceMode.VelocityChange);
+    }
+
+    private void CalcJumpForceOnSlope(ref Vector3 jumpForce)
+    {
+        var center = m_Player.resizableCapsule.CenterInWordSpace();
+        Ray ray = new Ray(center, Vector3.down);
+        if (Physics.Raycast(ray, out RaycastHit hitInfo, m_Player.config.jumpToGroundRayDistance, LayerMask.GetMask("Ground"), QueryTriggerInteraction.Ignore))
+        {
+            float angle = Vector3.Angle(hitInfo.normal, -ray.direction);
+
+            if (IsMovingUp())
+            {
+                float forceModier = m_Player.config.jumpForceModifierUpwards.Evaluate(angle);
+                jumpForce.x *= forceModier;
+                jumpForce.z *= forceModier;
+            }
+            else if (IsMovingDown())
+            {
+                float forceModier = m_Player.config.jumpForceModifierDownwards.Evaluate(angle);
+                jumpForce.y *= forceModier;
+            }
+        }
     }
     #endregion
 }

@@ -111,7 +111,7 @@ public class PlayerBaseState : IState
 
         float speed = GetMovementSpeed();
 
-        Vector3 curVelocity = GetHorizontalVelocity();
+        Vector3 curVelocity = GetPlayerHorizontalVelocity();
         m_StateMachine.player.rdBody.AddForce(speed * targetDir - curVelocity, ForceMode.VelocityChange);
     }
 
@@ -163,7 +163,13 @@ public class PlayerBaseState : IState
 
     protected void DecelerateHorizontally()
     {
-        var vel = GetHorizontalVelocity();
+        var vel = GetPlayerHorizontalVelocity();
+        m_Player.rdBody.AddForce(-vel * m_Player.attrs.decelerationForce, ForceMode.Acceleration);
+    }
+
+    protected void DecelerateVertically()
+    {
+        var vel = GetPlayerVerticalVelocity();
         m_Player.rdBody.AddForce(-vel * m_Player.attrs.decelerationForce, ForceMode.Acceleration);
     }
 
@@ -174,9 +180,19 @@ public class PlayerBaseState : IState
 
     protected bool IsMoveHorizontally(float miniMagnitude = 0.1f)
     {
-        var vel = GetHorizontalVelocity();
+        var vel = GetPlayerHorizontalVelocity();
         var vel2d = new Vector2(vel.x, vel.z);
         return vel2d.magnitude > miniMagnitude;
+    }
+
+    protected bool IsMovingUp(float miniMagnitude = 0.1f)
+    { 
+        return m_Player.rdBody.linearVelocity.y > miniMagnitude;
+    }
+
+    protected bool IsMovingDown(float miniMagnitude = 0.1f)
+    {
+        return m_Player.rdBody.linearVelocity.y < -miniMagnitude;
     }
 
     protected bool HasMovementInput()
@@ -199,9 +215,9 @@ public class PlayerBaseState : IState
         return speed;
     }
 
-    protected Vector3 GetHorizontalVelocity()
+    protected Vector3 GetPlayerHorizontalVelocity()
     {
-        var velocity = m_StateMachine.player.rdBody.linearVelocity;
+        var velocity = m_Player.rdBody.linearVelocity;
         velocity.y = 0f;
         return velocity;
     }
